@@ -14,13 +14,15 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
     {
         // INTERNAL VARIABLES
         internal Bitmap bitmapPicture_Statistics;
-        internal int TopCoordinate, LeftCoordinate;
+        private int TopCoordinate, LeftCoordinate, RightCoordinate, BottomCoordinate;
         internal int[] ValueArray;
         private int dataTableCount;
         private int DrawingWidth;
         private int DrawingHeight;
         private int ScaleWidth, ScaleHeight;
         private Point[] ChartPoints;
+        private Point ZeroPoint = new Point();
+        private Point StartPoint = new Point();
 
         public FormStatistics()
         {
@@ -40,6 +42,8 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
 
             dataTableCount = 5;
             TopCoordinate = LeftCoordinate = 50;
+            RightCoordinate = pbStatistics.Width - LeftCoordinate;
+            BottomCoordinate = pbStatistics.Height - TopCoordinate;
 
             ValueArray = new int[dataTableCount];
             ValueArray[0] = 8;
@@ -59,6 +63,9 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
             DrawVerticalLine(pbStatistics, bitmapPicture_Statistics, LeftCoordinate, TopCoordinate, pbStatistics.Height - TopCoordinate, 0xff, 0x00, 0xff);
             DrawHorizontalLine(pbStatistics, bitmapPicture_Statistics, LeftCoordinate, pbStatistics.Width - LeftCoordinate, pbStatistics.Height - TopCoordinate, 0xff, 0x00, 0xff);
             DrawLineChart(pbStatistics, bitmapPicture_Statistics);
+            //DrawBarChart(pbStatistics, bitmapPicture_Statistics);
+
+            DrawChartAttribute(pbStatistics, bitmapPicture_Statistics);
         }
 
         private void DrawLine(PictureBox pictureBox, Bitmap bitmapPicture, int xStart, int yStart, int xEnd, int yEnd, byte RedColor, byte GreenColor, byte BlueColor)
@@ -228,8 +235,6 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
             // this.labelSS = new System.Windows.Forms.Label();
 
             int MaximumRangeAxis;
-            Point ZeroPoint = new Point();
-            Point StartPoint = new Point();
             Point EndPoint = new Point();
             int currentStartPointX;
             int DataOrder;
@@ -251,7 +256,10 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
                 ChartPoints[DataOrder].Y = ZeroPoint.Y - (ValueArray[DataOrder] * ScaleHeight);
             }
 
-            // Tarik sebuah garis untuk menghubungkan point2 tersebut
+            // Tarik garis dari titik zero (0,0) sampai ke point pertama
+            DrawLine(pbStatistics, bitmapPicture_Statistics, ZeroPoint.X, ZeroPoint.Y, ChartPoints[0].X, ChartPoints[0].Y, 0xff, 0x00, 0x00);
+
+            // Tarik garis lanjutan untuk menghubungkan point2 tersebut
             for (DataOrder = 0; DataOrder < dataTableCount; DataOrder++)
             {
                 if (DataOrder < dataTableCount - 1)
@@ -269,9 +277,49 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
             }
         }
 
-        private void DrawBarChart()
+        private void DrawChartAttribute(PictureBox pictureBox, Bitmap bitmapPicture)
         {
+            int DataOrder;
+            int HorizontalAxisPoint_Start, HorizontalAxisPoint_End;
+            int VerticalAxisPoint_Start, VerticalAxisPoint_End;
+            int CurrentVerticalAxisPosition;
 
+            // Bangun garis vertikal dari horizontal axis sampai titik point
+            for (DataOrder = 0; DataOrder < dataTableCount; DataOrder++)
+            {
+                DrawVerticalLine(pbStatistics, bitmapPicture_Statistics, ChartPoints[DataOrder].X, ChartPoints[DataOrder].Y, BottomCoordinate, 0xff, 0xff, 0x00);
+            }
+
+            // Bangun skala dan keterangan pada horizontal axis
+            for (DataOrder = 0; DataOrder < dataTableCount; DataOrder++)
+            {
+                HorizontalAxisPoint_Start = BottomCoordinate - 10;
+                HorizontalAxisPoint_End = BottomCoordinate + 10;
+
+                DrawVerticalLine(pbStatistics, bitmapPicture_Statistics, ChartPoints[DataOrder].X, HorizontalAxisPoint_Start, HorizontalAxisPoint_End, 0x00, 0x00, 0xff);
+            }
+
+            // Bangun skala dan keterangan pada vertical axis
+            for (DataOrder = 0; DataOrder <= GetMaximumValue(); DataOrder++)
+            {
+                VerticalAxisPoint_Start = LeftCoordinate - 10;
+                VerticalAxisPoint_End = LeftCoordinate + 10;
+
+                CurrentVerticalAxisPosition = ZeroPoint.Y - (DataOrder * ScaleHeight);
+                DrawHorizontalLine(pbStatistics, bitmapPicture_Statistics, VerticalAxisPoint_Start, VerticalAxisPoint_End, CurrentVerticalAxisPosition, 0x00, 0x00, 0xff);
+            }
+
+            CurrentVerticalAxisPosition = ZeroPoint.Y;
+        }
+
+        private void DrawBarChart(PictureBox pictureBox, Bitmap bitmapPicture)
+        {
+            int OrderData;
+
+            for (OrderData = 0; OrderData < dataTableCount; OrderData++)
+            {
+                DrawVerticalLine(pbStatistics, bitmapPicture_Statistics, ChartPoints[OrderData].X, ChartPoints[OrderData].Y, BottomCoordinate, 0xff, 0xff, 0x00);
+            }
         }
 
         private void Question()
