@@ -47,6 +47,7 @@
             this.ClientSize = new System.Drawing.Size(802, 603);
             this.Controls.Add(this.pbStatistics);
             this.Name = "FormStatistics";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Line Chart";
             this.Load += new System.EventHandler(this.Statistics_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pbStatistics)).EndInit();
