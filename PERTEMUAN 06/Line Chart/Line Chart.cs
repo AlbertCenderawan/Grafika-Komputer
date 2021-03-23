@@ -230,6 +230,41 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
             return SavedMaxValue;
         }
 
+        private void DrawCircle(PictureBox pictureBox, Bitmap bitmapPicture, int xCenter, int yCenter, float radius, byte RedColor, byte GreenColor, byte BlueColor)
+        {
+            double angle, xLength = 0, yLength = 0;
+            int xScreenCoordinate = 0, yScreenCoordinate = 0;
+            double angleRAD;
+            int DataOrder;
+
+            for (DataOrder = 0; DataOrder < dataTableCount; DataOrder++)
+            {
+                // GAMBARKAN LINGKARAN DI SEMUA TITIK
+                for (angle = 0; angle <= 360; angle += 50 / radius)
+                {
+                    // Tentukan berapa panjang x dan panjang y untuk membentuk sebuah lingkaran (untuk koordinat kertas)
+                    angleRAD = angle * (Math.PI / 180);
+                    xLength = radius * Math.Cos(angleRAD);
+                    yLength = radius * Math.Sin(angleRAD);
+
+                    // Tentukan berapa panjang x dan panjang y untuk membentuk sebuah lingkaran (untuk koordinat layar)
+                    xScreenCoordinate = Convert.ToInt32(xCenter + xLength);
+                    yScreenCoordinate = Convert.ToInt32(yCenter - yLength);
+                    
+                    // set pixel
+                    int R = Convert.ToInt32(RedColor);
+                    int G = Convert.ToInt32(GreenColor);
+                    int B = Convert.ToInt32(BlueColor);
+
+                    int xScreenCoordinateInt = Convert.ToInt32(xScreenCoordinate);
+                    int yScreenCoordinateInt = Convert.ToInt32(yScreenCoordinate);
+
+                    bitmapPicture.SetPixel(xScreenCoordinate, yScreenCoordinate, Color.FromArgb(R, G, B));
+                    pictureBox.Image = bitmapPicture;
+                }
+            }
+        }
+
         private void DrawLineChart(PictureBox pictureBox, Bitmap bitmapPicture)
         {
             // this.labelSS = new System.Windows.Forms.Label();
@@ -238,6 +273,7 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
             Point EndPoint = new Point();
             int currentStartPointX;
             int DataOrder;
+            int Radius;
 
             MaximumRangeAxis = GetMaximumValue();
             ScaleHeight = DrawingHeight / MaximumRangeAxis;
@@ -275,6 +311,13 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
                     DrawLine(pbStatistics, bitmapPicture_Statistics, StartPoint.X, StartPoint.Y, EndPoint.X, EndPoint.Y, 0xff, 0x00, 0x00);
                 }
             }
+
+            // Gambarkan lingkaran di titik tersebut
+            for (DataOrder = 0; DataOrder < dataTableCount; DataOrder++)
+            {
+                Radius = 10;
+                DrawCircle(pbStatistics, bitmapPicture_Statistics, ChartPoints[DataOrder].X, ChartPoints[DataOrder].Y, Radius, 0x00, 0x00, 0xff);
+            }
         }
 
         private void DrawChartAttribute(PictureBox pictureBox, Bitmap bitmapPicture)
@@ -284,29 +327,37 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
             int VerticalAxisPoint_Start, VerticalAxisPoint_End;
             int CurrentVerticalAxisPosition;
 
-            // Bangun garis vertikal dari horizontal axis sampai titik point
-            for (DataOrder = 0; DataOrder < dataTableCount; DataOrder++)
-            {
-                DrawVerticalLine(pbStatistics, bitmapPicture_Statistics, ChartPoints[DataOrder].X, ChartPoints[DataOrder].Y, BottomCoordinate, 0xff, 0xff, 0x00);
-            }
+            // Tentukan posisi awal dan akhir pada garis horizontal axis
+            HorizontalAxisPoint_Start = BottomCoordinate - 10;
+            HorizontalAxisPoint_End = BottomCoordinate + 10;
+
+            // Tentukan posisi awal dan akhir pada garis vertical axis
+            VerticalAxisPoint_Start = LeftCoordinate - 10;
+            VerticalAxisPoint_End = LeftCoordinate + 10;
 
             // Bangun skala dan keterangan pada horizontal axis
             for (DataOrder = 0; DataOrder < dataTableCount; DataOrder++)
             {
-                HorizontalAxisPoint_Start = BottomCoordinate - 10;
-                HorizontalAxisPoint_End = BottomCoordinate + 10;
-
                 DrawVerticalLine(pbStatistics, bitmapPicture_Statistics, ChartPoints[DataOrder].X, HorizontalAxisPoint_Start, HorizontalAxisPoint_End, 0x00, 0x00, 0xff);
             }
 
             // Bangun skala dan keterangan pada vertical axis
             for (DataOrder = 0; DataOrder <= GetMaximumValue(); DataOrder++)
             {
-                VerticalAxisPoint_Start = LeftCoordinate - 10;
-                VerticalAxisPoint_End = LeftCoordinate + 10;
-
                 CurrentVerticalAxisPosition = ZeroPoint.Y - (DataOrder * ScaleHeight);
                 DrawHorizontalLine(pbStatistics, bitmapPicture_Statistics, VerticalAxisPoint_Start, VerticalAxisPoint_End, CurrentVerticalAxisPosition, 0x00, 0x00, 0xff);
+            }
+
+            // Bangun garis vertikal dari horizontal axis sampai titik point
+            for (DataOrder = 0; DataOrder < dataTableCount; DataOrder++)
+            {
+                DrawVerticalLine(pbStatistics, bitmapPicture_Statistics, ChartPoints[DataOrder].X, ChartPoints[DataOrder].Y, HorizontalAxisPoint_Start, 0x00, 0x00, 0x00);
+            }
+
+            // Bangun garis horizontal dari vertical axis sampai titik point
+            for (DataOrder = 0; DataOrder < ChartPoints.Length; DataOrder++)
+            {
+                DrawHorizontalLine(pbStatistics, bitmapPicture_Statistics, VerticalAxisPoint_End, ChartPoints[DataOrder].X, ChartPoints[DataOrder].Y, 0xff, 0x00, 0xff);
             }
 
             CurrentVerticalAxisPosition = ZeroPoint.Y;
