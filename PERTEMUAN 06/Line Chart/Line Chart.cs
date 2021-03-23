@@ -22,7 +22,7 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
         private int ScaleWidth, ScaleHeight;
         private Point[] ChartPoints;
         private Point ZeroPoint = new Point();
-        private Point StartPoint = new Point();
+        private int MaximumRangeAxis;
 
         public FormStatistics()
         {
@@ -56,16 +56,20 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
             DrawingHeight = pbStatistics.Height - (2 * TopCoordinate);
 
             ChartPoints = new Point[dataTableCount];
+            MaximumRangeAxis = GetMaximumValue();
+            ScaleHeight = DrawingHeight / (MaximumRangeAxis + 1);
+            ScaleWidth = DrawingWidth / (dataTableCount + 1);
         }
 
         internal void LetsDraw()
         {
-            DrawVerticalLine(pbStatistics, bitmapPicture_Statistics, LeftCoordinate, TopCoordinate, pbStatistics.Height - TopCoordinate, 0xff, 0x00, 0xff);
-            DrawHorizontalLine(pbStatistics, bitmapPicture_Statistics, LeftCoordinate, pbStatistics.Width - LeftCoordinate, pbStatistics.Height - TopCoordinate, 0xff, 0x00, 0xff);
+            DrawVerticalLine(pbStatistics, bitmapPicture_Statistics, LeftCoordinate, TopCoordinate, BottomCoordinate, 0xff, 0x00, 0xff);
+            DrawHorizontalLine(pbStatistics, bitmapPicture_Statistics, LeftCoordinate, RightCoordinate, BottomCoordinate, 0xff, 0x00, 0xff);
             DrawLineChart(pbStatistics, bitmapPicture_Statistics);
-            //DrawBarChart(pbStatistics, bitmapPicture_Statistics);
 
             DrawChartAttribute(pbStatistics, bitmapPicture_Statistics);
+
+            DrawBarChart(pbStatistics, bitmapPicture_Statistics);
         }
 
         private void DrawLine(PictureBox pictureBox, Bitmap bitmapPicture, int xStart, int yStart, int xEnd, int yEnd, byte RedColor, byte GreenColor, byte BlueColor)
@@ -267,17 +271,11 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
 
         private void DrawLineChart(PictureBox pictureBox, Bitmap bitmapPicture)
         {
-            // this.labelSS = new System.Windows.Forms.Label();
-
-            int MaximumRangeAxis;
+            Point StartPoint = new Point();
             Point EndPoint = new Point();
             int currentStartPointX;
             int DataOrder;
             int Radius;
-
-            MaximumRangeAxis = GetMaximumValue();
-            ScaleHeight = DrawingHeight / MaximumRangeAxis;
-            ScaleWidth = DrawingWidth / dataTableCount;
 
             // Titik 0
             ZeroPoint.X = LeftCoordinate;
@@ -365,11 +363,28 @@ namespace ComputerGraphics.Class_Meeting.PERTEMUAN_06
 
         private void DrawBarChart(PictureBox pictureBox, Bitmap bitmapPicture)
         {
-            int OrderData;
+            int DataOrder;
+            int halfWidth, barWidthStart, barWidthEnd;
+            int barHeightStart, barHeightEnd;
 
-            for (OrderData = 0; OrderData < dataTableCount; OrderData++)
+            // Tentukan ukuran dari bar terlebih dahulu
+            halfWidth = ScaleWidth / 2;
+
+            for (DataOrder = 0; DataOrder < dataTableCount; DataOrder++)
             {
-                DrawVerticalLine(pbStatistics, bitmapPicture_Statistics, ChartPoints[OrderData].X, ChartPoints[OrderData].Y, BottomCoordinate, 0xff, 0xff, 0x00);
+                // Tentukan width (lebar) dari bar
+                barWidthStart = ChartPoints[DataOrder].X - halfWidth;
+                barWidthEnd = ChartPoints[DataOrder].X + halfWidth;
+
+                // Tentukan height (tinggi) dari bar
+                barHeightStart = ChartPoints[DataOrder].Y;
+                barHeightEnd = BottomCoordinate;
+
+                // Buat rectangle sebagai bar
+                DrawRectangle(pbStatistics, bitmapPicture_Statistics, barWidthStart, barHeightStart, barWidthEnd, barHeightEnd, 0xff, 0x00, 0x00);
+
+                // Warnai rectangle terlebih dahulu
+                FillRectangle(pbStatistics, bitmapPicture_Statistics, barWidthStart, barHeightStart, barWidthEnd, barHeightEnd, 0x00, 0xff, 0x00);
             }
         }
 
