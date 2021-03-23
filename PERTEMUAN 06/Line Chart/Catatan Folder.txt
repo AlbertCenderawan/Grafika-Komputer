@@ -1,0 +1,3 @@
+Line Chart
+Bahasa Program = C#
+Dikerjakan oleh = AC
