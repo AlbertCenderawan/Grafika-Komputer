@@ -1,1 +1,6 @@
+<<<<<<< HEAD
 STATISTIC CHART
+=======
+Statistic Chart
+using C#
+>>>>>>> MainBranch
